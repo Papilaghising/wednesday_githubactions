@@ -7,7 +7,7 @@ variable "instance_type" {
 }
 
 variable "subnet_id" {
-  description = "The VPC subnet in which the instance "
+  description = "The VPC subne which the instance "
 }
 
 variable "ami_id" {

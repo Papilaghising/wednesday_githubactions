@@ -4,7 +4,7 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - tuesday_githubactions  
+      - wednesday_githubactions  
 
 jobs:
   terraform:

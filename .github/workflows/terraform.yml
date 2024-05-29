@@ -1,0 +1,96 @@
+<<<<<<< HEAD
+#.github/workflows/terraform
+=======
+#.github/workflows/terraform.yml
+>>>>>>> origin/tuesday_githubactions
+name: Terraform Deployment
+
+on:
+  push:
+    branches:
+      - tuesday_githubactions  
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1 
+
+
+      - name: Initialize Terraform
+        run: |
+          cd code
+          terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.SESSION_TOKEN }} 
+
+
+
+      - name: Apply Terraform Changes
+        run: |
+          cd code
+          terraform apply -var-file=vars.tfvars -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.SESSION_TOKEN }} 
+
+
+
+  upload:
+    needs: terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          AWS-ACCESS-KEY-ID: ${{ secrets.ACCESS_KEY }}
+          AWS-SECRET-ACCESS-KEY: ${{ secrets.SECRET_KEY }}
+          AWS-SESSION-TOKEN: ${{ secrets.SESSION_TOKEN }}
+          AWS-REGION: us-east-1
+
+      - name: Upload to S3
+        run: |
+          aws s3 sync . s3://ghising --exclude ".git/*"
+
+<<<<<<< HEAD
+  configure:
+    needs: [terraform ,upload ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          AWS-ACCESS-KEY-ID: ${{ secrets.ACCESS_KEY }}
+          AWS-SECRET-ACCESS-KEY: ${{ secrets.SECRET_KEY }}
+          AWS-SESSION-TOKEN: ${{ secrets.SESSION_TOKEN }}
+          AWS-REGION: us-east-1
+
+      - name: install ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: run ansible playbook
+        run: |
+          cd ansible
+          ansible-playbook -i aws_ec2.yml playbook.yml   
+
+=======
+>>>>>>> origin/tuesday_githubactions

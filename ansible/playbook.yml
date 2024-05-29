@@ -1,0 +1,40 @@
+---
+- hosts: nginx
+  become: true
+  gather_facts: true
+
+  vars:
+    ansible_user: ubuntu
+    s3_bucket_name: ghising
+    s3_bucket_path: code/
+    destination_path: /var/www/html/  
+    ansible_connection: aws_ssm
+    ansible_aws_ssm_region: us-east-1
+    ansible_aws_ssm_bucket_name: 8586-terraform-state 
+
+  roles:
+    - nginx
+
+  tasks:
+    - name: Install required Python packages for Ansible AWS modules
+      package:
+        name: python3-boto3
+        state: present
+
+    - name: Download code from S3 bucket
+      community.aws.aws_s3:
+        bucket: "{{ s3_bucket_name }}"
+        object: "{{ s3_bucket_path }}"
+        dest: "{{ destination_path }}"
+        mode: get
+        recurse: yes
+      register: s3_sync
+
+    - name: Ensure destination directory has correct permissions
+      file:
+        path: "{{ destination_path }}"
+        owner: www-data
+        group: www-data
+        mode: '0755'
+        recurse: yes
+      when: s3_sync.changed

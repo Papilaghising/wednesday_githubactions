@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - wednesday_githubactions  
+  workflow_dispatch:
 
 jobs:
   terraform:
@@ -28,6 +29,15 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.SESSION_TOKEN }} 
 
+      - name: Apply Terraform Changes
+        run: |
+          cd code
+          terraform plan -var-file=vars.tfvars -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.SESSION_TOKEN }}          
+
 
 
       - name: Apply Terraform Changes
@@ -39,6 +49,15 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.SESSION_TOKEN }} 
 
+      - name: Destroy Terraform Resources
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cd code
+          terraform destroy -var-file=vars.tfvars -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.SESSION_TOKEN }}
 
 
   upload:

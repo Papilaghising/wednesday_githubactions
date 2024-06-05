@@ -3,8 +3,7 @@ resource "aws_instance" "ec2_instance" {
   subnet_id                   = var.subnet_id
   instance_type               = var.instance_type
   associate_public_ip_address = true
-  key_name                    = "papila-intern"
-  iam_instance_profile = "intern-ujwal"
+  iam_instance_profile = var.iam_instance_profile
   tags = {
     Name      = "papila"
     silo      = "intern"

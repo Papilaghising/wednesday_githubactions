@@ -2,4 +2,33 @@
   ansible.builtin.apt:
     name: nginx
     state: latest
-    updtae_cache: true
+    update_cache: true  
+
+- name: Install AWS CLI using Snap
+  snap:  
+    name: aws-cli
+    classic: true
+    state: present
+
+- name: Install boto3 and botocore using apt
+  ansible.builtin.apt:
+    name:
+      - python3-boto3
+      - python3-botocore
+    state: present
+    update_cache: yes
+
+- name: Install Ansible
+  ansible.builtin.apt:
+    name: ansible
+    state: present
+    update_cache: true
+
+- name: Download file from S3 to EC2
+  aws_s3:
+    bucket: "ghising"  
+    object: "ansible/roles/nginx/handlers/main.yml" 
+    dest: "{{destination }}"
+    mode: get
+    region: "{{ region }}"
+  notify: Restart nginx

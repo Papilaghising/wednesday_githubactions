@@ -18,3 +18,6 @@ variable "vpc_id" {
   description = "The vpc to create ec2 on"
 }
 
+variable "iam_instance_profile" {
+  description = "roles for ssm and s3 access"
+}
